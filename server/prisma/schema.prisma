@@ -29,15 +29,17 @@ enum BookingStatus {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  password      String
-  role          Role           @default(STUDENT)
-  bookings      Booking[]
-  notifications Notification[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id               String         @id @default(uuid())
+  name             String
+  email            String         @unique
+  password         String
+  role             Role           @default(STUDENT)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  bookings         Booking[]
+  notifications    Notification[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 }
 
 model Resource {

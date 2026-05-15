@@ -30,7 +30,7 @@ export default function BookingsPage() {
 
   const handleUpdateStatus = async (id: string, status: BookingStatus) => {
     try {
-      await api.patch(`/bookings/${id}/status`, { status });
+      await api.put(`/bookings/${id}/status`, { status });
       fetchBookings();
     } catch (error) {
       console.error('Failed to update booking status', error);
