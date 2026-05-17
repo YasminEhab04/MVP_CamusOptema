@@ -7,12 +7,13 @@ import nodemailer from 'nodemailer';
 const prisma = new PrismaClient();
 
 const sendEmail = async (email: string, code: string) => {
-  console.log(`Sending reset code ${code} to ${email}`);
+  console.log(`Attempting to send reset code ${code} to ${email}...`);
   
   if (process.env.SMTP_HOST) {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -20,15 +21,32 @@ const sendEmail = async (email: string, code: string) => {
     });
 
     try {
-      await transporter.sendMail({
+      const info = await transporter.sendMail({
         from: '"Campus Resource" <no-reply@campus.edu>',
         to: email,
         subject: "Password Reset Code",
         text: `Your password reset code is: ${code}. It expires in 15 minutes.`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <h2 style="color: #2563eb; text-align: center;">Password Reset Request</h2>
+            <p>You requested a password reset for your Campus Resource account. Please use the following code to reset your password:</p>
+            <div style="font-size: 32px; font-weight: bold; background: #f3f4f6; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; letter-spacing: 5px; color: #1f2937;">
+              ${code}
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+            <p style="color: #6b7280; font-size: 14px;">If you did not request this, please ignore this email.</p>
+          </div>
+        `,
       });
+      console.log('Email sent successfully! Message ID:', info.messageId);
+      if (process.env.SMTP_HOST.includes('ethereal.email')) {
+        console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+      }
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error('CRITICAL: Failed to send email:', error);
     }
+  } else {
+    console.error('ERROR: SMTP_HOST is not configured in environment variables.');
   }
 };
 
