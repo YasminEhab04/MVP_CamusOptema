@@ -14,7 +14,7 @@ const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.nativeEnum(Role).default(Role.STUDENT),
+  role: z.nativeEnum(Role),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -30,6 +30,9 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      role: Role.STUDENT,
+    },
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -59,6 +62,7 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4 rounded-md shadow-sm">
             <Input
@@ -68,6 +72,7 @@ export default function RegisterPage() {
               error={errors.name?.message}
               {...register('name')}
             />
+
             <Input
               label="Email address"
               type="email"
@@ -75,6 +80,7 @@ export default function RegisterPage() {
               error={errors.email?.message}
               {...register('email')}
             />
+
             <Input
               label="Password"
               type="password"
@@ -82,10 +88,12 @@ export default function RegisterPage() {
               error={errors.password?.message}
               {...register('password')}
             />
+
             <div className="w-full">
               <label className="mb-1 block text-sm font-medium text-zinc-700">
                 Role
               </label>
+
               <select
                 {...register('role')}
                 className="block w-full rounded-md border border-zinc-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
