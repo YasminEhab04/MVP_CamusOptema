@@ -33,6 +33,7 @@ export default function NewResourcePage() {
     resolver: zodResolver(resourceSchema),
     defaultValues: {
       type: ResourceType.ROOM,
+      capacity: 1,
     },
   });
 
@@ -86,7 +87,11 @@ export default function NewResourcePage() {
                 <option value={ResourceType.LAB}>Lab</option>
                 <option value={ResourceType.EQUIPMENT}>Equipment</option>
               </select>
-              {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type.message}</p>}
+              {errors.type && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.type.message}
+                </p>
+              )}
             </div>
 
             <Input
@@ -94,7 +99,7 @@ export default function NewResourcePage() {
               type="number"
               placeholder="e.g. 10"
               error={errors.capacity?.message}
-              {...register('capacity')}
+              {...register('capacity', { valueAsNumber: true })}
             />
 
             <Input
