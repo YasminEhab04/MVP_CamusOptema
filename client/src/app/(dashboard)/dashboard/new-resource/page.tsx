@@ -18,7 +18,12 @@ const resourceSchema = z.object({
   location: z.string().min(2, 'Location must be at least 2 characters'),
 });
 
-type ResourceFormValues = z.infer<typeof resourceSchema>;
+type ResourceFormValues = {
+  name: string;
+  type: ResourceType;
+  capacity: number;
+  location: string;
+};
 
 export default function NewResourcePage() {
   const router = useRouter();
